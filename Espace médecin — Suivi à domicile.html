@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suivi à domicile — Espace médecin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F3; --surface:#FFFFFF; --ink:#14262F; --muted:#566A73; --line:#D3DDE1;
+  --brand:#1D5C63; --brand-ink:#FFFFFF; --tint:#E2EDEE;
+  --sage-fill:#2F7D5C; --sage-fill-ink:#FFFFFF; --sage-bg:#DFF0E7; --sage-ink:#1D6446;
+  --amber:#B9770E; --amber-bg:#FBEBD0; --amber-ink:#7E4B00;
+  --danger:#A83A36; --phone-frame:#14262F;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A1F; --surface:#162329; --ink:#E6EEF1; --muted:#93A7B0; --line:#27393F;
+    --brand:#5FB3B8; --brand-ink:#0B1A1E; --tint:#1B2E33;
+    --sage-fill:#5DBB93; --sage-fill-ink:#0B1A14; --sage-bg:#1B3329; --sage-ink:#7FD3AB;
+    --amber:#E0A040; --amber-bg:#3A2C12; --amber-ink:#F0C06A;
+    --danger:#E07873; --phone-frame:#3A4F57;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A1F; --surface:#162329; --ink:#E6EEF1; --muted:#93A7B0; --line:#27393F;
+  --brand:#5FB3B8; --brand-ink:#0B1A1E; --tint:#1B2E33;
+  --sage-fill:#5DBB93; --sage-fill-ink:#0B1A14; --sage-bg:#1B3329; --sage-ink:#7FD3AB;
+  --amber:#E0A040; --amber-bg:#3A2C12; --amber-ink:#F0C06A;
+  --danger:#E07873; --phone-frame:#3A4F57;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  height:100%;margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.5;
+}
+button,input,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+h1,h2,h3,p,ul,ol{margin:0}
+.muted{color:var(--muted)}
+
+/* ---------- Connexion ---------- */
+.login{height:100%;display:grid;place-items:center;padding:20px}
+.login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px}
+.login-card h1{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;margin:14px 0 4px}
+.login-card p{color:var(--muted);margin-bottom:20px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;font-size:.9rem;font-weight:500}
+.field input,.field textarea,.field select{
+  border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--surface);font-weight:400;
+}
+.proto{margin-top:16px;font-size:.82rem;color:var(--muted)}
+
+/* ---------- Structure ---------- */
+.shell{height:100%;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+.top-right{display:flex;align-items:center;gap:12px;font-size:.92rem}
+.ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+.ghost:hover{background:var(--tint)}
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:minmax(270px,330px) 1fr}
+.rail{display:flex;flex-direction:column;min-height:0;background:var(--surface);border-right:1px solid var(--line)}
+.rail-head{padding:16px 16px 10px}
+.rail-head h2{font-size:1.05rem;font-weight:650;margin-bottom:10px}
+.rail-head h2 span{color:var(--muted);font-weight:500}
+.rail-head input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--bg)}
+.seg{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:none;border-radius:999px;padding:3px 12px;font-size:.85rem}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.plist{list-style:none;padding:0 8px 8px;overflow:auto;flex:1}
+.pitem{
+  width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:10px;
+  padding:10px 10px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;
+}
+.pitem:hover{background:var(--bg)}
+.pitem[aria-current="true"]{background:var(--tint);border-color:var(--brand)}
+.pname{font-weight:600}
+.pprog{font-size:.82rem;color:var(--muted);text-align:right}
+.pmeta{font-size:.84rem;color:var(--muted)}
+.rail-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:.82rem}
+.rail-foot button{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0}
+
+.detail{min-height:0;overflow:auto;padding:24px 28px 40px}
+.detail-in{max-width:1120px}
+.empty{height:100%;display:grid;place-items:center;text-align:center;color:var(--muted);padding:20px}
+.back{display:none;background:none;border:0;color:var(--brand);font-weight:600;padding:0 0 12px}
+
+/* ---------- Badges ---------- */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.b-topres{background:var(--tint);color:var(--brand)}
+.b-active{background:var(--sage-bg);color:var(--sage-ink)}
+.b-planned{background:var(--tint);color:var(--brand)}
+.b-alert{background:var(--amber-bg);color:var(--amber-ink)}
+.b-done{background:var(--line);color:var(--ink)}
+
+/* ---------- Fiche patient ---------- */
+.phead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.phead h1{font-size:1.75rem;font-weight:700;letter-spacing:-.015em;line-height:1.2}
+.phead .sub{color:var(--muted);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+.card.soft{background:transparent;border-style:dashed}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.card-h h2{font-size:1.05rem;font-weight:650}
+.banner{border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:.92rem}
+.banner.warn{background:var(--amber-bg);color:var(--amber-ink)}
+.banner.info{background:var(--tint);color:var(--ink)}
+.rxlist{list-style:none;padding:0;display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
+.exnum{display:inline-block;background:var(--tint);color:var(--brand);font-weight:700;font-size:.78rem;border-radius:6px;padding:1px 7px;margin-right:4px}
+
+.strip{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
+.cell{height:38px;border-radius:7px;display:grid;place-items:center;font-size:.85rem;font-weight:600;border:1px solid var(--line);color:var(--muted)}
+.cell.done{background:var(--sage-fill);color:var(--sage-fill-ink);border-color:var(--sage-fill)}
+.cell.missed{
+  color:var(--amber-ink);border-color:var(--amber);
+  background:repeating-linear-gradient(135deg,var(--amber-bg) 0 5px,transparent 5px 10px);
+}
+.cell.today{background:var(--surface);color:var(--ink);border:2px solid var(--brand);box-shadow:0 0 0 3px var(--tint)}
+.cell.future{border-style:dashed}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:.84rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid var(--line)}
+.sw.done{background:var(--sage-fill);border-color:var(--sage-fill)}
+.sw.missed{border-color:var(--amber);background:repeating-linear-gradient(135deg,var(--amber-bg) 0 3px,transparent 3px 6px)}
+.sw.today{border:2px solid var(--brand)}
+.sw.future{border-style:dashed}
+.stat{margin-top:12px;font-size:.95rem}
+
+/* ---------- Ordonnance ---------- */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px;align-items:start}
+.phonewrap{position:sticky;top:0}
+fieldset{border:0;padding:0;margin:0 0 16px}
+legend{font-weight:600;font-size:.95rem;margin-bottom:8px;padding:0}
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.ex{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.ex.on{border-color:var(--brand);background:var(--tint)}
+.ex-pick{width:100%;text-align:left;background:none;border:0;padding:11px 12px;display:flex;flex-direction:column;gap:2px}
+.ex.on .exnum{background:var(--brand);color:var(--brand-ink)}
+.ex-pick .exnum{align-self:flex-start;margin:0 0 4px}
+.exname{font-weight:600;line-height:1.3}
+.exdesc{font-size:.84rem;color:var(--muted);line-height:1.4}
+.exzone{font-size:.8rem;color:var(--muted);margin-top:4px}
+.stepper{display:flex;align-items:center;gap:6px;padding:0 12px 11px;font-size:.84rem}
+.stepper button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:1.1rem;line-height:1}
+.stepper input{width:54px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:5px 4px;background:var(--surface)}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.row .field{flex:1;min-width:150px}
+.summary{margin:4px 0 14px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:.93rem}
+.summary.err{color:var(--danger)}
+.primary{background:var(--brand);color:var(--brand-ink);border:0;border-radius:10px;padding:11px 20px;font-weight:600}
+.primary:disabled{opacity:.45;cursor:not-allowed}
+details{margin-top:16px;font-size:.9rem}
+summary{cursor:pointer;color:var(--muted)}
+pre{margin:10px 0 0;padding:12px;border-radius:10px;background:var(--bg);overflow-x:auto;font-size:.8rem;line-height:1.45}
+
+/* ---------- Aperçu téléphone ---------- */
+.phone{width:100%;max-width:270px;margin:0 auto;border:7px solid var(--phone-frame);border-radius:30px;background:var(--bg);overflow:hidden}
+.screen{padding:24px 16px 18px;min-height:430px}
+.hello{color:var(--muted);font-size:.85rem}
+.screen h3{font-size:1.25rem;margin:2px 0 4px}
+.dayline{font-weight:600;color:var(--brand);margin-bottom:8px}
+.bar{height:6px;border-radius:99px;background:var(--line);margin-bottom:14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sage-fill)}
+.pex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;flex-direction:column}
+.pex span{color:var(--muted);font-size:.85rem}
+.pnote{font-size:.82rem;background:var(--tint);border-radius:10px;padding:8px 10px;margin:10px 0}
+.pbtn{margin-top:12px;background:var(--brand);color:var(--brand-ink);text-align:center;padding:10px;border-radius:12px;font-weight:600}
+.pmsg{margin-top:18px;color:var(--muted)}
+.cap{text-align:center;font-size:.82rem;color:var(--muted);margin-top:10px}
+
+.rail-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.rail-top h2{margin:0}
+.primary.small{padding:6px 12px;font-size:.88rem;border-radius:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ghost:disabled{opacity:.45;cursor:not-allowed}
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  transform:translate(-50%,24px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:10px;font-weight:500;
+  max-width:calc(100% - 32px);transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1100px){
+  .grid2{grid-template-columns:1fr}
+  .phonewrap{position:static}
+}
+@media (max-width:860px){
+  .cols{grid-template-columns:1fr}
+  .cols[data-detail="0"] .detail{display:none}
+  .cols[data-detail="1"] .rail{display:none}
+  .back{display:block}
+  .detail{padding:16px 16px 32px}
+  .top{padding:10px 14px}
+  .who{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= Données fictives ================= */
+var DAY=86400000, LS_KEY='suivi-domicile-v2';
+
+var EXERCISES=[
+  {id:1,name:"Flexion-extension du coude",zone:"Membre supérieur",desc:"Assis, avant-bras sur la table : plier puis tendre le coude lentement."},
+  {id:2,name:"Élévation de l'épaule",zone:"Membre supérieur",desc:"Assis, mains jointes : lever les bras devant soi jusqu'à l'horizontale."},
+  {id:3,name:"Passage assis-debout",zone:"Membre inférieur",desc:"Se lever d'une chaise puis se rasseoir en répartissant le poids sur les deux jambes."},
+  {id:4,name:"Rotation du poignet",zone:"Main et poignet",desc:"Avant-bras posé, tourner la paume vers le haut puis vers le bas."},
+  {id:5,name:"Transfert du poids latéral",zone:"Équilibre",desc:"Debout, déplacer le poids du corps sur la jambe atteinte puis revenir au centre."},
+  {id:6,name:"Pont fessier",zone:"Tronc et bassin",desc:"Allongé, genoux pliés : soulever le bassin et tenir 2 secondes."}
+];
+function exById(id){return EXERCISES.filter(function(e){return e.id===id})[0]}
+
+function sod(d){var x=new Date(d);x.setHours(0,0,0,0);return x}
+var TODAY=sod(new Date());
+function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return sod(x)}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function parseISO(s){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;
+  var p=s.split('-').map(Number),x=new Date(p[0],p[1]-1,p[2]);
+  return isNaN(x.getTime())?null:x;
+}
+function diff(a,b){return Math.round((sod(a)-sod(b))/DAY)}
+var FMT=new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
+function fd(d){return FMT.format(d)}
+var FMTY=new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function listFr(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' et '+a[a.length-1]}
+function $(s){return document.querySelector(s)}
+
+function mkRx(exs,days,offset,history,note){
+  return {
+    exercises:exs.map(function(e){return {id:e[0],reps:e[1]}}),
+    days:days,start:iso(addDays(TODAY,-offset)),history:history,note:note||''
+  };
+}
+function seed(){
+  return [
+    {id:'p1',name:'Amine Ben Salah',age:62,side:'droite',stroke:'AVC il y a 5 semaines',
+     rx:mkRx([[1,12],[2,12]],15,8,'11111011','Allez-y doucement sur le coude.')},
+    {id:'p2',name:'Leila Trabelsi',age:58,side:'gauche',stroke:'AVC il y a 3 semaines',
+     rx:mkRx([[2,12],[3,12]],20,11,'11101101100','')},
+    {id:'p3',name:'Mohamed Gharbi',age:71,side:'droite',stroke:'AVC il y a 2 semaines',rx:null},
+    {id:'p4',name:'Sonia Mejri',age:49,side:'gauche',stroke:'AVC il y a 3 mois',
+     rx:mkRx([[3,12],[5,10],[6,10]],20,24,'111111101111111111111011','')},
+    {id:'p5',name:'Karim Jlassi',age:66,side:'droite',stroke:'AVC il y a 10 jours',rx:null},
+    {id:'p6',name:'Hela Ben Ammar',age:55,side:'droite',stroke:'AVC il y a 6 semaines',
+     rx:mkRx([[1,10],[4,10]],30,3,'111','')},
+    {id:'p7',name:'Fathi Cherif',age:68,side:'gauche',stroke:'AVC il y a 4 semaines',
+     rx:mkRx([[2,12],[3,12]],20,0,'','')}
+  ];
+}
+
+var patients=seed();
+function loadSaved(){
+  try{
+    var raw=localStorage.getItem(LS_KEY); if(!raw)return;
+    var saved=JSON.parse(raw)||{}, rxs=saved.rx||{};
+    patients.forEach(function(p){ if(rxs[p.id]){p.rx=rxs[p.id];p.custom=true} });
+    (saved.added||[]).forEach(function(a){ if(a&&a.id&&a.name){a.added=true;patients.push(a)} });
+  }catch(e){}
+}
+function persist(){
+  try{
+    var rx={},added=[];
+    patients.forEach(function(p){ if(p.added)added.push(p); else if(p.custom)rx[p.id]=p.rx });
+    localStorage.setItem(LS_KEY,JSON.stringify({rx:rx,added:added}));
+  }catch(e){}
+}
+loadSaved();
+
+/* ================= Logique ================= */
+function info(p){
+  var rx=p.rx;
+  if(!rx)return {key:'topres',label:'À prescrire'};
+  var start=parseISO(rx.start), n=rx.days, end=addDays(start,n-1), dayNum=diff(TODAY,start)+1;
+  var h=rx.history||'';
+  var past=Math.min(n,Math.max(0,dayNum-1)), doneCount=0, i;
+  for(i=0;i<past;i++){ if(h[i]==='1')doneCount++ }
+  var base={start:start,end:end,n:n,dayNum:dayNum,doneCount:doneCount,past:past};
+  function ext(o){for(var k in base)o[k]=base[k];return o}
+  if(dayNum<1)return ext({key:'planned',label:'Programmée'});
+  if(dayNum>n)return ext({key:'done',label:'Terminé'});
+  var missed3=0,k;
+  for(k=1;k<=3;k++){ i=dayNum-1-k; if(i>=0&&h[i]!=='1')missed3++ }
+  var alert=missed3>=2;
+  return ext({key:alert?'alert':'active',label:alert?'Séances manquées':'En cours',missed3:missed3});
+}
+var ORDER={alert:0,topres:1,done:2,active:3,planned:4};
+
+var state={view:'login',sel:null,q:'',filter:'all',mobile:false,adding:false};
+var draft;
+function newDraft(){draft={sel:[],days:20,start:iso(TODAY),note:''}}
+newDraft();
+function cur(){return patients.filter(function(p){return p.id===state.sel})[0]||null}
+var np;
+function newNp(){np={name:'',age:'',side:'droite',stroke:''}}
+newNp();
+function target(){return state.adding?{id:'(nouveau)',name:np.name.trim()||'Prénom Nom',rx:null}:cur()}
+function patientCheck(){
+  var age=parseInt(np.age,10), err='';
+  if(!np.name.trim())err='Indiquez le nom du patient.';
+  else if(!(age>=1&&age<=120))err='Indiquez un âge valide (entre 1 et 120).';
+  return {ok:!err,err:err,age:age};
+}
+
+function draftCheck(){
+  var days=parseInt(draft.days,10), start=parseISO(draft.start), err='';
+  if(!draft.sel.length)err='Choisissez au moins un exercice.';
+  else if(!(days>=1&&days<=90))err='La durée doit être comprise entre 1 et 90 jours.';
+  else if(!start||diff(start,TODAY)<0)err="La date de début ne peut pas être dans le passé.";
+  else if(draft.sel.some(function(x){return !(x.reps>=1&&x.reps<=50)}))err='Les répétitions doivent être comprises entre 1 et 50.';
+  return {ok:!err,err:err,days:days,start:start};
+}
+function payload(p){
+  function mk(exs,days,startISO,note){
+    return {
+      patientId:p.id,
+      exercises:exs.map(function(e){return {exerciseId:e.id,name:exById(e.id).name,repsPerDay:e.reps}}),
+      durationDays:days,startDate:startISO,
+      endDate:iso(addDays(parseISO(startISO),days-1)),
+      note:note||'',status:'active'
+    };
+  }
+  if(draft.sel.length){
+    var v=draftCheck(); if(!v.ok)return null;
+    return mk(draft.sel,v.days,draft.start,draft.note.trim());
+  }
+  if(p.rx)return mk(p.rx.exercises,p.rx.days,p.rx.start,p.rx.note);
+  return null;
+}
+
+/* ================= Rendu ================= */
+function brandMark(){
+  return '<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="15" width="5" height="9" rx="1.5" fill="var(--brand)" opacity=".45"/><rect x="10.5" y="9" width="5" height="15" rx="1.5" fill="var(--brand)" opacity=".7"/><rect x="19" y="2" width="5" height="22" rx="1.5" fill="var(--brand)"/></svg>';
+}
+
+function renderLogin(){
+  $('#app').innerHTML=
+   '<div class="login"><form class="login-card" id="loginForm">'+brandMark()+
+   '<h1>Espace médecin</h1><p>Connectez-vous pour suivre vos patients à domicile.</p>'+
+   '<label class="field">Adresse e-mail<input type="email" value="dr.karray@hopital-demo.tn" autocomplete="username"></label>'+
+   '<label class="field">Mot de passe<input type="password" value="demo-demo" autocomplete="current-password"></label>'+
+   '<button class="primary" type="submit" style="width:100%">Se connecter</button>'+
+   '<p class="proto">Prototype : données fictives, aucune donnée réelle n\'est enregistrée.</p></form></div>';
+}
+
+function renderApp(){
+  $('#app').innerHTML=
+   '<div class="shell"><header class="top"><div class="brand">'+brandMark()+'<span>Suivi à domicile</span></div>'+
+   '<div class="top-right"><span class="who">Dr Karray</span><button class="ghost" data-act="logout">Se déconnecter</button></div></header>'+
+   '<div class="cols" id="cols" data-detail="0">'+
+   '<aside class="rail"><div class="rail-head"><div class="rail-top"><h2>Mes patients <span id="count"></span></h2><button class="primary small" data-act="newpatient">+ Nouveau patient</button></div>'+
+   '<input id="search" type="search" placeholder="Rechercher un patient" aria-label="Rechercher un patient">'+
+   '<div class="seg" id="seg" role="group" aria-label="Filtrer les patients">'+
+   '<button data-filter="all">Tous</button><button data-filter="topres">À prescrire</button><button data-filter="watch">À surveiller</button></div></div>'+
+   '<ul class="plist" id="list"></ul>'+
+   '<div class="rail-foot"><button data-act="reset">Réinitialiser les données de démonstration</button></div></aside>'+
+   '<main class="detail" id="detail"></main></div></div>';
+  $('#search').value=state.q;
+  renderList(); renderDetail(true); syncCols();
+}
+
+function syncCols(){
+  var c=$('#cols'); if(c)c.dataset.detail=state.mobile?'1':'0';
+}
+
+function renderList(){
+  var q=state.q.trim().toLowerCase();
+  var items=patients.filter(function(p){return p.name.toLowerCase().indexOf(q)>-1}).filter(function(p){
+    var k=info(p).key;
+    if(state.filter==='topres')return k==='topres';
+    if(state.filter==='watch')return k==='alert'||k==='done';
+    return true;
+  }).sort(function(a,b){return ORDER[info(a).key]-ORDER[info(b).key]||a.name.localeCompare(b.name,'fr')});
+  $('#count').textContent='('+patients.length+')';
+  Array.prototype.forEach.call(document.querySelectorAll('#seg button'),function(b){
+    b.setAttribute('aria-pressed',String(b.dataset.filter===state.filter));
+  });
+  $('#list').innerHTML=items.length?items.map(function(p){
+    var i=info(p);
+    var prog=i.key==='active'||i.key==='alert'?'Jour '+i.dayNum+'/'+i.n:(i.key==='planned'?'Début '+fd(i.start):'');
+    return '<li><button class="pitem" data-pid="'+p.id+'" aria-current="'+(p.id===state.sel&&!state.adding)+'">'+
+      '<span class="pname">'+esc(p.name)+'</span><span class="pprog">'+prog+'</span>'+
+      '<span class="pmeta">'+p.age+' ans · côté '+p.side+'</span><span class="badge b-'+i.key+'">'+i.label+'</span></button></li>';
+  }).join(''):'<li class="muted" style="padding:14px 10px">Aucun patient ne correspond à cette recherche.</li>';
+}
+
+function stripHTML(rx,inf){
+  var s='',i;
+  for(i=0;i<rx.days;i++){
+    var date=addDays(inf.start,i), dn=diff(date,TODAY);
+    var st=dn<0?((rx.history||'')[i]==='1'?'done':'missed'):(dn===0?'today':'future');
+    var txt={done:'faite',missed:'manquée',today:"aujourd'hui",future:'à venir'}[st];
+    s+='<li class="cell '+st+'" title="Jour '+(i+1)+' · '+fd(date)+' · '+txt+'" aria-label="Jour '+(i+1)+', '+fd(date)+', '+txt+'"><span>'+(i+1)+'</span></li>';
+  }
+  return s;
+}
+
+function programHTML(p){
+  if(!p.rx)return '';
+  var inf=info(p), banner='', stat='';
+  if(inf.key==='alert')banner='<p class="banner warn">'+inf.missed3+' séances manquées sur les 3 derniers jours. Contactez le patient ou ajustez l\'ordonnance.</p>';
+  if(inf.key==='done')banner='<p class="banner info">Programme terminé. Une réévaluation est recommandée avant la prochaine ordonnance.</p>';
+  if(inf.key==='planned')stat='Le programme débute le '+fd(inf.start)+'.';
+  else if(inf.key==='done')stat='Programme terminé : '+inf.doneCount+' séances faites sur '+inf.n+' jours.';
+  else stat="Aujourd'hui : jour "+inf.dayNum+' sur '+inf.n+'. '+(inf.past?('Séances faites : '+inf.doneCount+' sur '+inf.past+' jour'+(inf.past>1?'s':'')+' écoulé'+(inf.past>1?'s':'')+'.'):'Première séance aujourd\'hui.');
+  var lines=p.rx.exercises.map(function(e){
+    return '<li><span class="exnum">Ex '+e.id+'</span>'+esc(exById(e.id).name)+' <span class="muted">· '+e.reps+' répétitions par jour</span></li>';
+  }).join('');
+  return '<section class="card"><div class="card-h"><h2>Programme prescrit</h2><span class="muted">du '+fd(inf.start)+' au '+fd(inf.end)+' · '+inf.n+' jours</span></div>'+
+    banner+'<ul class="rxlist">'+lines+'</ul>'+
+    '<ol class="strip" aria-label="Suivi jour par jour">'+stripHTML(p.rx,inf)+'</ol>'+
+    '<div class="legend"><span><i class="sw done"></i>Faite</span><span><i class="sw missed"></i>Manquée</span><span><i class="sw today"></i>Aujourd\'hui</span><span><i class="sw future"></i>À venir</span></div>'+
+    '<p class="stat">'+stat+'</p></section>';
+}
+
+function formHTML(p){
+  var adding=state.adding, inf=adding?null:info(p);
+  var warn=(!adding&&p.rx&&inf.key!=='done')?'<p class="banner warn">Envoyer une nouvelle ordonnance remplacera le programme en cours.</p>':'';
+  var cards=EXERCISES.map(function(x){
+    var it=draft.sel.filter(function(s){return s.id===x.id})[0];
+    return '<div class="ex'+(it?' on':'')+'"><button type="button" class="ex-pick" data-pick="'+x.id+'" aria-pressed="'+(!!it)+'">'+
+      '<span class="exnum">Ex '+x.id+'</span><span class="exname">'+esc(x.name)+'</span><span class="exdesc">'+esc(x.desc)+'</span><span class="exzone">'+esc(x.zone)+'</span></button>'+
+      (it?'<div class="stepper"><button type="button" data-step="-1" data-for="'+x.id+'" aria-label="Moins de répétitions">−</button>'+
+        '<input type="number" inputmode="numeric" min="1" max="50" value="'+it.reps+'" data-reps="'+x.id+'" aria-label="Répétitions par jour, exercice '+x.id+'">'+
+        '<button type="button" data-step="1" data-for="'+x.id+'" aria-label="Plus de répétitions">+</button><span>rép. par jour</span></div>':'')+
+      '</div>';
+  }).join('');
+  return '<section class="card"><div class="card-h"><h2>'+(adding?'Exercices du patient (facultatif)':'Nouvelle ordonnance')+'</h2></div>'+warn+
+    '<fieldset><legend>Exercices à faire chaque jour</legend><div class="exgrid">'+cards+'</div></fieldset>'+
+    '<div class="row"><label class="field">Durée (jours)<input id="days" type="number" inputmode="numeric" min="1" max="90" value="'+esc(draft.days)+'"></label>'+
+    '<label class="field">Date de début<input id="start" type="date" min="'+iso(TODAY)+'" value="'+esc(draft.start)+'"></label></div>'+
+    '<label class="field">Message pour le patient (facultatif)<textarea id="note" rows="2" placeholder="Ex. : arrêtez en cas de douleur.">'+esc(draft.note)+'</textarea></label>'+
+    '<p class="summary" id="summary"></p>'+
+    '<div class="actions"><button class="primary" id="send" data-act="send">'+(adding?'Ajouter le patient et envoyer l\'ordonnance':'Envoyer à l\'application')+'</button>'+
+    (adding?'<button class="ghost" id="addonly" data-act="addonly">Ajouter sans ordonnance</button><button class="ghost" data-act="cancel">Annuler</button>':'')+'</div>'+
+    '<details><summary>Données envoyées à Firebase</summary><pre id="json"></pre></details></section>';
+}
+
+function dayView(first,exs,day,n,note){
+  var pct=(typeof n==='number'&&n>0)?Math.round((day-1)/n*100):0;
+  return '<p class="hello">Bonjour '+first+'</p><h3>Exercices du jour</h3><p class="dayline">Jour '+day+' sur '+n+'</p>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+    exs.map(function(e){var x=exById(e.id);return '<div class="pex"><b>'+esc(x.name)+'</b><span>'+(e.reps||'…')+' répétitions</span></div>'}).join('')+
+    (note&&note.trim()?'<p class="pnote">Message du médecin : '+esc(note.trim())+'</p>':'')+
+    '<div class="pbtn">Commencer la séance</div>';
+}
+function msgView(first,msg){
+  return '<p class="hello">Bonjour '+first+'</p><h3>Exercices du jour</h3><p class="pmsg">'+esc(msg)+'</p>';
+}
+function phoneHTML(p){
+  var first=esc(p.name.split(' ')[0]), body='', cap="Ce que voit le patient aujourd'hui";
+  if(draft.sel.length){
+    var v=draftCheck();
+    cap="Aperçu de la future ordonnance (jour 1)";
+    body=dayView(first,draft.sel,1,v.ok?v.days:(parseInt(draft.days,10)||'…'),draft.note);
+  }else if(p.rx){
+    var inf=info(p);
+    if(inf.key==='planned')body=msgView(first,'Votre programme commence le '+fd(inf.start)+'.');
+    else if(inf.key==='done')body=msgView(first,'Votre programme est terminé. Merci pour votre régularité.');
+    else body=dayView(first,p.rx.exercises,inf.dayNum,inf.n,p.rx.note);
+  }else{
+    body=msgView(first,"Aucun exercice n'est prescrit pour le moment.");
+  }
+  return '<div class="phone" role="group" aria-label="Aperçu de l\'écran du patient"><div class="screen">'+body+'</div></div><p class="cap">'+cap+'</p>';
+}
+
+function renderDetail(toTop){
+  var el=$('#detail'); if(!el)return;
+  var top=el.scrollTop, p=cur();
+  if(state.adding){
+    el.innerHTML='<div class="detail-in"><button class="back" data-act="cancel">‹ Retour aux patients</button>'+
+      '<div class="phead"><div><h1>Nouveau patient</h1><p class="sub">Renseignez le patient, puis choisissez ses exercices.</p></div></div>'+
+      '<section class="card"><div class="card-h"><h2>Informations du patient</h2></div>'+
+      '<div class="row"><label class="field">Nom complet<input id="np-name" type="text" autocomplete="off" value="'+esc(np.name)+'"></label>'+
+      '<label class="field">Âge<input id="np-age" type="number" inputmode="numeric" min="1" max="120" value="'+esc(np.age)+'"></label></div>'+
+      '<div class="row"><label class="field">Côté atteint<select id="np-side"><option value="droite"'+(np.side==='droite'?' selected':'')+'>Côté droit</option><option value="gauche"'+(np.side==='gauche'?' selected':'')+'>Côté gauche</option></select></label>'+
+      '<label class="field">Date de l\'AVC (facultatif)<input id="np-stroke" type="date" max="'+iso(TODAY)+'" value="'+esc(np.stroke)+'"></label></div></section>'+
+      '<div class="grid2"><div>'+formHTML(null)+'</div><div class="phonewrap" id="phone"></div></div></div>';
+    el.scrollTop=toTop?0:top; updateLive(); return;
+  }
+  if(!p){
+    el.innerHTML='<div class="empty"><p>Choisissez un patient dans la liste<br>pour voir son programme ou lui prescrire des exercices.</p></div>';
+    return;
+  }
+  var inf=info(p);
+  el.innerHTML='<div class="detail-in"><button class="back" data-act="back">‹ Retour aux patients</button>'+
+    '<div class="phead"><div><h1>'+esc(p.name)+'</h1><p class="sub">'+p.age+' ans · Hémiplégie '+p.side+' · '+esc(p.stroke)+'</p></div>'+
+    '<span class="badge b-'+inf.key+'">'+inf.label+'</span></div>'+
+    programHTML(p)+
+    '<div class="grid2"><div>'+formHTML(p)+'</div><div class="phonewrap" id="phone"></div></div>'+
+    '<section class="card soft"><div class="card-h"><h2>Rapport de l\'IA sur les séances</h2></div>'+
+    '<p class="muted">À venir : un résumé automatique des séances (répétitions, qualité du mouvement, asymétrie entre les deux côtés) apparaîtra ici.</p></section></div>';
+  el.scrollTop=toTop?0:top;
+  updateLive();
+}
+
+function updateLive(){
+  var p=target(); if(!p||!$('#summary'))return;
+  var adding=state.adding, pv=adding?patientCheck():{ok:true,err:''}, v=draftCheck(), s=$('#summary');
+  if(adding&&!pv.ok){s.className='summary err';s.textContent=pv.err}
+  else if(!v.ok){
+    var none=!draft.sel.length;
+    s.className='summary'+(none?'':' err');
+    s.textContent=(adding&&none)?'Aucun exercice choisi : vous pourrez en prescrire plus tard.':v.err;
+  }else{
+    var names=draft.sel.map(function(e){return 'Ex '+e.id+' ('+e.reps+' rép.)'});
+    s.className='summary';
+    s.textContent='Ordonnance : '+listFr(names)+', chaque jour pendant '+v.days+' jours, du '+fd(v.start)+' au '+fd(addDays(v.start,v.days-1))+'.';
+  }
+  $('#send').disabled=!(pv.ok&&v.ok);
+  var ao=$('#addonly'); if(ao)ao.disabled=!pv.ok;
+  $('#phone').innerHTML=phoneHTML(p);
+  var pl=payload(p); $('#json').textContent=pl?JSON.stringify(pl,null,2):'Aucune ordonnance à afficher pour le moment.';
+}
+
+/* ================= Actions ================= */
+var toastTimer;
+function toast(msg){
+  var t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show')},3800);
+}
+function selectPatient(id){
+  state.sel=id; state.mobile=true; state.adding=false; newDraft(); renderList(); renderDetail(true); syncCols();
+}
+function togglePick(id){
+  var i=-1; draft.sel.forEach(function(s,k){if(s.id===id)i=k});
+  if(i>-1)draft.sel.splice(i,1); else draft.sel.push({id:id,reps:12});
+  draft.sel.sort(function(a,b){return a.id-b.id});
+  renderDetail(false);
+}
+function stepReps(id,d){
+  var it=draft.sel.filter(function(s){return s.id===id})[0]; if(!it)return;
+  it.reps=Math.min(50,Math.max(1,(it.reps||12)+d));
+  var inp=document.querySelector('input[data-reps="'+id+'"]'); if(inp)inp.value=it.reps;
+  updateLive();
+}
+function send(){
+  if(state.adding){createPatient(true);return}
+  var p=cur(), v=draftCheck(); if(!p||!v.ok)return;
+  p.rx={
+    exercises:draft.sel.map(function(e){return {id:e.id,reps:e.reps}}),
+    days:v.days,start:draft.start,history:'',note:draft.note.trim()
+  };
+  p.custom=true; persist();
+  var n=p.name;
+  newDraft(); renderList(); renderDetail(true);
+  toast('Ordonnance envoyée à l\'application de '+n+'.');
+}
+function createPatient(withRx){
+  var pv=patientCheck(); if(!pv.ok)return;
+  var v=draftCheck(); if(withRx&&!v.ok)return;
+  var sd=parseISO(np.stroke);
+  var p={id:'n'+Date.now(),name:np.name.trim(),age:pv.age,side:np.side,
+    stroke:sd?'AVC le '+FMTY.format(sd):"Date de l'AVC non renseignée",rx:null,added:true};
+  if(withRx)p.rx={
+    exercises:draft.sel.map(function(e){return {id:e.id,reps:e.reps}}),
+    days:v.days,start:draft.start,history:'',note:draft.note.trim()
+  };
+  patients.push(p); persist();
+  state.adding=false; state.sel=p.id; state.mobile=true;
+  newDraft(); newNp(); renderList(); renderDetail(true); syncCols();
+  toast(p.name+' a été ajouté'+(withRx?' et son ordonnance a été envoyée à l\'application.':'.'));
+}
+function act(a){
+  if(a==='logout'){state.view='login';state.sel=null;state.mobile=false;state.adding=false;renderLogin()}
+  else if(a==='newpatient'){
+    state.adding=true; state.mobile=true; newDraft(); newNp(); renderList(); renderDetail(true); syncCols();
+    var f=$('#np-name'); if(f)f.focus();
+  }
+  else if(a==='cancel'){state.adding=false;state.mobile=false;newDraft();newNp();renderList();renderDetail(true);syncCols()}
+  else if(a==='addonly')createPatient(false);
+  else if(a==='back'){state.mobile=false;syncCols()}
+  else if(a==='send')send();
+  else if(a==='reset'){
+    try{localStorage.removeItem(LS_KEY)}catch(e){}
+    patients=seed(); newDraft(); renderList(); renderDetail(true); toast('Données de démonstration réinitialisées.');
+  }
+}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act],[data-pick],[data-step],[data-pid],[data-filter]'); if(!b)return;
+  var d=b.dataset;
+  if(d.act)act(d.act);
+  else if(d.pick)togglePick(+d.pick);
+  else if(d.step)stepReps(+d.for,+d.step);
+  else if(d.pid)selectPatient(d.pid);
+  else if(d.filter){state.filter=d.filter;renderList()}
+});
+document.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='search'){state.q=t.value;renderList()}
+  else if(t.id==='days'){draft.days=t.value;updateLive()}
+  else if(t.id==='start'){draft.start=t.value;updateLive()}
+  else if(t.id==='note'){draft.note=t.value;updateLive()}
+  else if(t.id==='np-name'){np.name=t.value;updateLive()}
+  else if(t.id==='np-age'){np.age=t.value;updateLive()}
+  else if(t.id==='np-side'){np.side=t.value;updateLive()}
+  else if(t.id==='np-stroke'){np.stroke=t.value;updateLive()}
+  else if(t.dataset&&t.dataset.reps){
+    var it=draft.sel.filter(function(s){return s.id===+t.dataset.reps})[0];
+    if(it){it.reps=parseInt(t.value,10);updateLive()}
+  }
+});
+document.addEventListener('submit',function(e){
+  if(e.target.id==='loginForm'){e.preventDefault();state.view='main';renderApp()}
+});
+
+renderLogin();
+})();
+</script>
+</body>
+</html>
